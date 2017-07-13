@@ -1,0 +1,82 @@
+<html>
+<head>
+	<style type="text/css" media="screen">
+	    #editor { 
+	        position: absolute;
+	        top: 50px;
+	        right: 0;
+	        bottom: 0;
+	        left: 0;
+	    }
+	</style>
+	<!--<script src="./src-noconflict/ace.js"></script> -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.8/ace.js"></script>
+	<!--    <script src="./src-noconflict/ext-static_highlight.js"></script>-->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <!--[if lt IE 9]>
+        <script src="./build/src/ext-old_ie.js"></script>
+    <![endif]-->
+    <!-- <script src="./jquery.js"></script> -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+	<div>
+        <label for="text_url" >Input URL:</label>
+        <input type="text" id="text_url" name="text_url" style="width:400px;">
+        <input type="button" value="View Source Code" id="btnViewSource">
+	</div>
+	<div id="editor">
+		
+	</div>
+
+	<script>
+	
+		$(document).ready(function() {
+		
+		    var editor = ace.edit("editor");
+		    editor.setTheme("ace/theme/monokai");
+            editor.getSession().setMode("ace/mode/html");
+		    editor.setValue('');
+		    
+		    function highlight() {
+			    var highlighter = ace.require("ace/ext/static_highlight")
+			    var dom = ace.require("ace/lib/dom")
+			    function qsa(sel) {
+			        var els = document.querySelectorAll(sel);
+			        var result = [];
+			        for (var i = 0, l = els.length; i < l; i++)
+			            result[i] = els[i];
+
+			        return result;
+			    }
+
+			    qsa("code[class]").forEach(function(el) {
+			        var m = el.className.match(/language-(\w+)|(javascript)/);
+                    console.log(m);
+			        if (!m) return
+			        var mode = "ace/mode/" + (m[1] || m[2]);
+
+			        highlighter.highlight(el, {mode: mode, theme: "ace/theme/xcode"})
+			    });
+			}
+			highlight();
+
+            $("#btnViewSource").on("click", function() {
+                $.ajax({
+                    url: "https://afternoon-caverns-58681.herokuapp.com/",
+                    type: "get",
+                    crossDomain: false,
+                    data: {
+                        url: $("#text_url").val()
+                    },
+                    success: function(resp) {
+                        editor.setValue(resp);
+                    }
+                })
+            });
+
+		});
+		
+	</script>
+</body>
+</html>
